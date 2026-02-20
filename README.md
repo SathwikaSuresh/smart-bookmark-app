@@ -1,33 +1,121 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🔖 Smart Bookmark Manager
 
-## Getting Started
+A full-stack bookmark management web app that allows users to save, organize and access links instantly from any device.
 
-First, run the development server:
+The goal of this project was to build a real-world CRUD application with authentication, database syncing and realtime updates — similar to how modern productivity tools work.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+---
+
+## 🚀 Features
+
+* Add, edit and delete bookmarks
+* Store title + URL
+* Persistent cloud storage
+* Realtime syncing
+* Responsive UI
+* Fast search and filtering
+* Clean minimal dashboard
+
+---
+
+## 🛠️ Tech Stack
+
+Frontend: React / Next.js
+Backend & DB: Supabase (PostgreSQL + Realtime)
+Styling: Tailwind CSS
+Deployment: Vercel
+
+---
+
+## 🧠 Problems I Faced & How I Solved Them
+
+### 1) Delete not working (Supabase Realtime Error)
+
+**Problem:**
+When deleting a bookmark, the console showed:
+
+> cannot delete from table "bookmarks" because it does not have a replica identity and publishes deletes
+
+**Why it happened:**
+Supabase realtime needs a primary key to track row changes.
+My table didn’t have REPLICA IDENTITY FULL enabled.
+
+**Solution:**
+I enabled replica identity from SQL editor:
+
+```sql
+ALTER TABLE bookmarks REPLICA IDENTITY FULL;
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+After this, realtime delete events started working correctly.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 2) Data not updating automatically
 
-## Learn More
+**Problem:**
+UI only updated after refresh.
 
-To learn more about Next.js, take a look at the following resources:
+**Why it happened:**
+I initially fetched data only once using useEffect.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+**Solution:**
+I implemented Supabase realtime subscription:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+* Subscribed to INSERT, UPDATE and DELETE events
+* Updated local state dynamically
+
+Now bookmarks sync instantly across tabs.
+
+---
+
+### 3) "bookmarks is not defined" error in Next.js
+
+**Problem:**
+Page crashed during rendering.
+
+**Cause:**
+Component rendered before data loaded from DB.
+
+**Fix:**
+Added loading state & conditional rendering:
+
+```js
+if (!bookmarks) return <p>Loading...</p>;
+```
+
+---
+
+### 4) Accidentally uploading node_modules to GitHub
+
+**Problem:**
+Repository size became huge and push failed.
+
+**Solution:**
+Created `.gitignore` and removed cached files:
+
+```bash
+git rm -r --cached node_modules
+```
+
+---
+
+## 💡 What I Learned
+
+* Realtime databases require primary key tracking
+* Difference between client state vs server state
+* Importance of loading states in React apps
+* How production apps handle CRUD synchronization
+* Proper GitHub project structure
+
+## 🔗 Live Demo
+
+(Add deployed link)
+
+
+## 👩‍💻 Author
+
+Sathwika Pulusu
 
 ## Deploy on Vercel
 
